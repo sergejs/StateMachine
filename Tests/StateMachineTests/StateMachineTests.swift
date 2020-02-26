@@ -1,5 +1,13 @@
-import XCTest
+//
+//  StateMachineTests.swift
+//  StateMachineTests
+//
+//  Created by Sergejs Smirnovs on 05/03/2020.
+//  Copyright © 2020 Sergejs Smirnovs. All rights reserved.
+//
+
 @testable import StateMachine
+import XCTest
 
 enum TestEvents: EventProtocol {
   case event1, event2

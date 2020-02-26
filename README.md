@@ -4,6 +4,12 @@ Short package containing easy implamentation of Finite State Machine using Combi
 
 To start using, all you need is to defeine enums with States and Events, and define Transitions. 
 
+TODO:
+
+[ ]Add more tests coverage
+[ ]Some more tests
+[ ]Add some kind of check for Transitions(canTransit = (()-(bool))
+
 enum TestEvents: EventProtocol {
   case event1, event2
 }
