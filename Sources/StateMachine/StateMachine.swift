@@ -48,14 +48,14 @@ extension StateMachine {
   func append(transition: StateMachineTransition<EventType, StateType>) {
     if let transitionsByEvent = transitions[transition.event] {
       guard transitionsByEvent.filter ({ $0.from == transition.from }).isEmpty else {
-        print("Failed to appended \(transition.from) -> \(transition.to) with event \(transition.event)")
+        log("Failed to appended \(transition.from) -> \(transition.to) with event \(transition.event)")
         return assertionFailure("Transition \(transition.from) & \(transition.event) already exists!")
       }
       transitions[transition.event]?.append(transition)
     } else {
       transitions[transition.event] = [transition]
     }
-    print("Appended \(transition.from) -> \(transition.to) with event \(transition.event)")
+    log("Appended \(transition.from) -> \(transition.to) with event \(transition.event)")
   }
 }
 
@@ -83,7 +83,7 @@ extension StateMachine {
     let resetCancelable = reset.sink { [weak self] _ in
       guard let this = self else { return }
       
-      print("Performing RESET to \(this.initialState)")
+      log("Performing RESET to \(this.initialState)")
       this.state.send(this.initialState)
     }
     
@@ -97,7 +97,7 @@ extension StateMachine {
     let stateMachine = changeState.stateMachine
     let transition = changeState.transition
     stateMachine.willChangeState.send(changeState)
-    print("Performing transition \(transition.from) -> \(transition.to) with event \(transition.event)")
+    log("Performing transition \(transition.from) -> \(transition.to) with event \(transition.event)")
     stateMachine.state.send(transition.to)
     stateMachine.didChangeState.send(changeState)
   }
@@ -111,6 +111,13 @@ extension StateMachine {
   }
 }
 
+
+private
+extension StateMachine {
+  func log(value: String) {
+//    print(value)
+  }
+}
 public struct StateMachineTransition<EventType: Hashable, StateType: Hashable> {
   public let event: EventType
   public let from: StateType
@@ -126,5 +133,3 @@ public struct StateMachineTransition<EventType: Hashable, StateType: Hashable> {
     self.to = to
   }
 }
-
-
