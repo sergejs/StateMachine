@@ -27,7 +27,7 @@ public protocol StateMachineProtocol {
 }
 
 public class StateMachine<EventType: EventProtocol, StateType: StateProtocol>: StateMachineProtocol {
-  private let transitionQueue = OperationQueue()
+  let transitionQueue = OperationQueue()
   private var disposeBag = [AnyCancellable]()
   private var transitions = [EventType: [StateMachineTransition<EventType, StateType>]]()
   public var isLoggingEnabled = false
@@ -72,7 +72,7 @@ extension StateMachine {
 private
 extension StateMachine {
   func setupEventSubject() {
-    let eventCancelable = Publishers
+    Publishers
       .CombineLatest(event, state)
       .sink(receiveValue: { [weak self] (event, currentState) in
         guard
@@ -87,19 +87,18 @@ extension StateMachine {
         }
         this.transitionQueue.addOperation(transiotion)
       })
-
-    disposeBag.append(eventCancelable)
+      .store(in: &disposeBag)
   }
 
   func setupResetSubject() {
-    let resetCancelable = reset.sink { [weak self] _ in
-      guard let this = self else { return }
+    reset
+      .sink { [weak self] _ in
+        guard let this = self else { return }
 
-      this.log("Performing RESET to \(this.initialState)")
-      this.state.send(this.initialState)
+        this.log("Performing RESET to \(this.initialState)")
+        this.state.send(this.initialState)
     }
-
-    disposeBag.append(resetCancelable)
+    .store(in: &disposeBag)
   }
 }
 
