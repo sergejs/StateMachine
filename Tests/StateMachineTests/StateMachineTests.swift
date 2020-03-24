@@ -24,8 +24,10 @@ final class StateMachineTests: XCTestCase {
     let stateMachine = StateMachine<TestEvents, TestStates>(with: .initial)
     let transition = StateMachineTransition<TestEvents, TestStates>(event: .event1, from: .initial, to: .finish)
     stateMachine.append(transition: transition)
+    stateMachine.transitionQueue.waitUntilAllOperationsAreFinished()
     XCTAssertEqual(stateMachine.state.value, .initial)
     stateMachine.event.send(.event1)
+    stateMachine.transitionQueue.waitUntilAllOperationsAreFinished()
     XCTAssertEqual(stateMachine.state.value, .finish)
   }
 
@@ -38,10 +40,13 @@ final class StateMachineTests: XCTestCase {
     stateMachine.append(transition: transition)
     transition = StateMachineTransition<TestEvents, TestStates>(event: .event2, from: .step1, to: .finish)
     stateMachine.append(transition: transition)
+    stateMachine.transitionQueue.waitUntilAllOperationsAreFinished()
     XCTAssertEqual(stateMachine.state.value, .initial)
     stateMachine.event.send(.event1)
+    stateMachine.transitionQueue.waitUntilAllOperationsAreFinished()
     XCTAssertEqual(stateMachine.state.value, .step1)
     stateMachine.event.send(.event2)
+    stateMachine.transitionQueue.waitUntilAllOperationsAreFinished()
     XCTAssertEqual(stateMachine.state.value, .finish)
   }
 

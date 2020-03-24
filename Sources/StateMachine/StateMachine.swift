@@ -27,6 +27,7 @@ public protocol StateMachineProtocol {
 }
 
 public class StateMachine<EventType: EventProtocol, StateType: StateProtocol>: StateMachineProtocol {
+  private let transitionQueue = OperationQueue()
   private var disposeBag = [AnyCancellable]()
   private var transitions = [EventType: [StateMachineTransition<EventType, StateType>]]()
   public var isLoggingEnabled = false
@@ -81,8 +82,10 @@ extension StateMachine {
           let transition = transitions.first(where: { $0.from == currentState })
           else { return }
 
-        let change = ChangeStateType(stateMachine: this, transition: transition)
-        Self.performTransition(changeState: change)
+        let transiotion = BlockOperation {
+          this.perform(transition: transition)
+        }
+        this.transitionQueue.addOperation(transiotion)
       })
 
     disposeBag.append(eventCancelable)
