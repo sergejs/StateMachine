@@ -69,6 +69,15 @@ extension StateMachine {
   }
 }
 
+public
+extension StateMachine {
+  func append(transitions: [StateMachineTransition<EventType, StateType>]) {
+    transitions.forEach { transition in
+      append(transition: transition)
+    }
+  }
+}
+
 private
 extension StateMachine {
   func setupEventSubject() {
