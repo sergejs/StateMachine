@@ -19,16 +19,11 @@ let package = Package(
   ],
   products: [
     .library(
-      name: "StateMachine",
-      targets: ["StateMachine"]),
+      name: "StateMachine", type: .dynamic, targets: ["StateMachine"]),
   ],
   dependencies: [],
   targets: [
-    .target(
-      name: "StateMachine",
-      dependencies: []),
-    .testTarget(
-      name: "StateMachineTests",
-      dependencies: ["StateMachine"]),
+    .target(name: "StateMachine", dependencies: []),
+    .testTarget(name: "StateMachineTests", dependencies: ["StateMachine"]),
   ]
 )
