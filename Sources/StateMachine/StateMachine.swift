@@ -53,8 +53,7 @@ public class StateMachine<EventType: EventProtocol, StateType: StateProtocol>: S
   }
 }
 
-public
-extension StateMachine {
+public extension StateMachine {
   func append(transition: StateMachineTransition<EventType, StateType>) {
     if let transitionsByEvent = transitions[transition.event] {
       guard transitionsByEvent.filter({ $0.from == transition.from }).isEmpty else {
@@ -69,8 +68,7 @@ extension StateMachine {
   }
 }
 
-public
-extension StateMachine {
+public extension StateMachine {
   func append(transitions: [StateMachineTransition<EventType, StateType>]) {
     transitions.forEach { transition in
       append(transition: transition)
@@ -78,8 +76,7 @@ extension StateMachine {
   }
 }
 
-private
-extension StateMachine {
+private extension StateMachine {
   func setupEventSubject() {
     Publishers
       .CombineLatest(event, state)
@@ -111,8 +108,7 @@ extension StateMachine {
   }
 }
 
-private
-extension StateMachine {
+private extension StateMachine {
   func perform(transition: StateMachineTransition<EventType, StateType>) {
     willChangeState.send(transition)
     log("Performing transition \(transition.from) -> \(transition.to) with event \(transition.event)")
@@ -121,16 +117,14 @@ extension StateMachine {
   }
 }
 
-private
-extension StateMachine {
+private extension StateMachine {
   func log(_ value: String) {
     guard isLoggingEnabled else { return }
     print(value)
   }
 }
 
-public
-struct StateMachineTransition<EventType: Hashable, StateType: Hashable> {
+public struct StateMachineTransition<EventType: Hashable, StateType: Hashable> {
   public let event: EventType
   public let from: StateType
   public let to: StateType
@@ -143,5 +137,13 @@ struct StateMachineTransition<EventType: Hashable, StateType: Hashable> {
     self.event = event
     self.from = from
     self.to = to
+  }
+
+  public static func make(
+    event: EventType,
+    from: [StateType],
+    to: StateType
+  ) -> [Self] {
+    from.map { Self.init(event: event, from: $0, to: to) }
   }
 }
