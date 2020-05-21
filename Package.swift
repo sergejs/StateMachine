@@ -19,9 +19,19 @@ let package = Package(
   ],
   products: [
     .library(
-      name: "StateMachine", type: .dynamic, targets: ["StateMachine"]),
+      name: "StateMachine", type: .dynamic, targets: ["StateMachine"]
+    ),
   ],
-  dependencies: [],
+  dependencies: [
+    .package(
+      url: "https://github.com/realm/SwiftLint",
+      from: "0.39.1"
+    ),
+    .package(
+      url: "https://github.com/nicklockwood/SwiftFormat",
+      from: "0.44.4"
+    ),
+  ],
   targets: [
     .target(name: "StateMachine", dependencies: []),
     .testTarget(name: "StateMachineTests", dependencies: ["StateMachine"]),

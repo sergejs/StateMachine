@@ -80,13 +80,13 @@ private extension StateMachine {
   func setupEventSubject() {
     Publishers
       .CombineLatest(event, state)
-      .sink(receiveValue: { [weak self] (event, currentState) in
+      .sink(receiveValue: { [weak self] event, currentState in
         guard
           let this = self,
           let transitions = this.transitions[event],
           transitions.filter({ $0.from == currentState }).count == 1,
           let transition = transitions.first(where: { $0.from == currentState })
-          else { return }
+        else { return }
 
         let transiotion = BlockOperation {
           this.perform(transition: transition)
@@ -103,8 +103,8 @@ private extension StateMachine {
 
         this.log("Performing RESET to \(this.initialState)")
         this.state.send(this.initialState)
-    }
-    .store(in: &disposeBag)
+      }
+      .store(in: &disposeBag)
   }
 }
 
@@ -144,6 +144,6 @@ public struct StateMachineTransition<EventType: Hashable, StateType: Hashable> {
     from: [StateType],
     to: StateType
   ) -> [Self] {
-    from.map { Self.init(event: event, from: $0, to: to) }
+    from.map { Self(event: event, from: $0, to: to) }
   }
 }

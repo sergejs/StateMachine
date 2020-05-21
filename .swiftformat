@@ -1,0 +1,11 @@
+--trimwhitespace always
+--indent 2
+--indentcase true
+--wraparguments before-first
+--wrapparameters before-first
+--wrapcollections before-first
+
+
+--disable unusedArguments
+
+--exclude Pods, Libs, .build
