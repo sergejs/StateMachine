@@ -28,7 +28,7 @@ final class StateMachineTests: XCTestCase {
     XCTAssertEqual(stateMachine.state.value, .initial)
     stateMachine.event.send(.event1)
     stateMachine.transitionQueue.waitUntilAllOperationsAreFinished()
-    XCTAssertEqual(stateMachine.state.value, .finish)
+    XCTAssertEqual(stateMachine.state.value, .step1)
   }
 
   // Long Initial -> (Event1) -> Step1 -> (Event2) -> Finish
