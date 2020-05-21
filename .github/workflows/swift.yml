@@ -13,10 +13,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v2
-    - name: Swift format
-      run: swift run swiftformat . --lint
-    - name: Swift link
-      run: swift run swiftlint
     - name: Build
       run: swift build -v
     - name: Run tests

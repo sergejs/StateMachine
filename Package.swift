@@ -22,16 +22,7 @@ let package = Package(
       name: "StateMachine", type: .dynamic, targets: ["StateMachine"]
     ),
   ],
-  dependencies: [
-    .package(
-      url: "https://github.com/realm/SwiftLint",
-      from: "0.39.1"
-    ),
-    .package(
-      url: "https://github.com/nicklockwood/SwiftFormat",
-      from: "0.44.4"
-    ),
-  ],
+  dependencies: [],
   targets: [
     .target(name: "StateMachine", dependencies: []),
     .testTarget(name: "StateMachineTests", dependencies: ["StateMachine"]),
