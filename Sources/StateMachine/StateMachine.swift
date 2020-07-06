@@ -7,8 +7,8 @@
 //
 
 import Combine
-import CoreBluetooth
 import Foundation
+import SwiftLogger
 
 public protocol EventProtocol: Hashable {}
 public protocol StateProtocol: Hashable {}
@@ -26,11 +26,19 @@ public protocol StateMachineProtocol {
   func append(transition: StateMachineTransition<EventType, StateType>)
 }
 
-public class StateMachine<EventType: EventProtocol, StateType: StateProtocol>: StateMachineProtocol {
+public class StateMachine<EventType: EventProtocol, StateType: StateProtocol>: StateMachineProtocol, Loggable {
   let transitionQueue = OperationQueue()
   private var disposeBag = [AnyCancellable]()
   private var transitions = [EventType: [StateMachineTransition<EventType, StateType>]]()
-  public var isLoggingEnabled = false
+  public var isLoggingEnabled = false {
+    didSet {
+      if isLoggingEnabled {
+        allowLogging()
+      } else {
+        disableLogging()
+      }
+    }
+  }
 
   public let initialState: StateType
   public var state: CurrentValueSubject<StateType, Never>
@@ -48,6 +56,8 @@ public class StateMachine<EventType: EventProtocol, StateType: StateProtocol>: S
     didChangeState = PassthroughSubject()
     initialState = state
 
+    Logger.sharedInstance.setupLogger(logger: osLogger())
+
     setupEventSubject()
     setupResetSubject()
   }
@@ -57,14 +67,14 @@ public extension StateMachine {
   func append(transition: StateMachineTransition<EventType, StateType>) {
     if let transitionsByEvent = transitions[transition.event] {
       guard transitionsByEvent.filter({ $0.from == transition.from }).isEmpty else {
-        log("Failed to appended \(transition.from) -> \(transition.to) with event \(transition.event)")
+        log(level: .fault, "Failed to appended \(transition.from) -> \(transition.to) with event \(transition.event)")
         return assertionFailure("Transition \(transition.from) & \(transition.event) already exists!")
       }
       transitions[transition.event]?.append(transition)
     } else {
       transitions[transition.event] = [transition]
     }
-    log("Appended \(transition.from) -> \(transition.to) with event \(transition.event)")
+    log(level: .info, "Appended \(transition.from) -> \(transition.to) with event \(transition.event)")
   }
 }
 
@@ -100,8 +110,7 @@ private extension StateMachine {
     reset
       .sink { [weak self] _ in
         guard let this = self else { return }
-
-        this.log("Performing RESET to \(this.initialState)")
+        this.log(level: .info, "Performing RESET to \(this.initialState)")
         this.state.send(this.initialState)
       }
       .store(in: &disposeBag)
@@ -111,16 +120,9 @@ private extension StateMachine {
 private extension StateMachine {
   func perform(transition: StateMachineTransition<EventType, StateType>) {
     willChangeState.send(transition)
-    log("Performing transition \(transition.from) -> \(transition.to) with event \(transition.event)")
+    log(level: .info, "Performing transition \(transition.from) -> \(transition.to) with event \(transition.event)")
     state.send(transition.to)
     didChangeState.send(transition)
-  }
-}
-
-private extension StateMachine {
-  func log(_ value: String) {
-    guard isLoggingEnabled else { return }
-    print(value)
   }
 }
 

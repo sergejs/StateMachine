@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "SwiftLogger",
+        "repositoryURL": "git@github.com:sergejs/SwiftLogger.git",
+        "state": {
+          "branch": null,
+          "revision": "0eb0097d6b484d885a0bfe030ee5345736e33279",
+          "version": "1.0.1"
+        }
+      }
+    ]
+  },
+  "version": 1
+}

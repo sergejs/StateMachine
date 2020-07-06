@@ -19,12 +19,16 @@ let package = Package(
   ],
   products: [
     .library(
-      name: "StateMachine", type: .dynamic, targets: ["StateMachine"]
+      name: "StateMachine",
+      type: .dynamic,
+      targets: ["StateMachine"]
     ),
   ],
-  dependencies: [],
+  dependencies: [
+    .package(url: "git@github.com:sergejs/SwiftLogger.git", from: "1.0.0")
+  ],
   targets: [
-    .target(name: "StateMachine", dependencies: []),
+    .target(name: "StateMachine", dependencies: ["SwiftLogger"]),
     .testTarget(name: "StateMachineTests", dependencies: ["StateMachine"]),
   ]
 )
