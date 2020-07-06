@@ -22,6 +22,7 @@ final class StateMachineTests: XCTestCase {
   // Short Initial -> (Event1) -> Finish
   func testShort() {
     let stateMachine = StateMachine<TestEvents, TestStates>(with: .initial)
+    stateMachine.isLoggingEnabled = true
     let transition = StateMachineTransition<TestEvents, TestStates>(event: .event1, from: .initial, to: .finish)
     stateMachine.append(transition: transition)
     stateMachine.transitionQueue.waitUntilAllOperationsAreFinished()
@@ -34,6 +35,7 @@ final class StateMachineTests: XCTestCase {
   // Long Initial -> (Event1) -> Step1 -> (Event2) -> Finish
   func testLong() {
     let stateMachine = StateMachine<TestEvents, TestStates>(with: .initial)
+    stateMachine.isLoggingEnabled = true
     XCTAssertEqual(stateMachine.state.value, .initial)
 
     var transition = StateMachineTransition<TestEvents, TestStates>(event: .event1, from: .initial, to: .step1)
@@ -52,5 +54,6 @@ final class StateMachineTests: XCTestCase {
 
   static var allTests = [
     ("testShort", testShort),
+    ("testLong", testLong),
   ]
 }
