@@ -74,7 +74,6 @@ public extension StateMachine {
     } else {
       transitions[transition.event] = [transition]
     }
-    log(level: .info, "Appended \(transition.from) -> \(transition.to) with event \(transition.event)")
   }
 }
 
