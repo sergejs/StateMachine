@@ -1,6 +1,8 @@
 # StateMachine
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fsergejs%2FStateMachine%2Fbadge%3Ftype%3Dswift-versions)](https://swiftpackageindex.com/sergejs/StateMachine)
+[![](https://img.shields.io/endpoint?url=https%3A%2F%2Fswiftpackageindex.com%2Fapi%2Fpackages%2Fsergejs%2FStateMachine%2Fbadge%3Ftype%3Dplatforms)](https://swiftpackageindex.com/sergejs/StateMachine)
 
-Short package containing easy implamentation of Finite State Machine using Combine & Generics
+Package containing easy implamentation of Finite State Machine using Combine
 
 To start using, all you need is to defeine enums with States and Events, and define Transitions. 
 
