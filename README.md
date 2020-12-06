@@ -20,7 +20,7 @@ To start using, all you need is to defeine enums with States and Events, and def
     
     let stateMachine = StateMachine<TestEvents, TestStates>(with: .initial)
     let transition = StateMachineTransition<TestEvents, TestStates>(event: .event1, from: .initial, to: .finish)
-    stateMachine.append(transition: transition)
+    try? stateMachine.append(transition: transition)
     stateMachine.transitionQueue.waitUntilAllOperationsAreFinished()
     XCTAssertEqual(stateMachine.state.value, .initial)
     
