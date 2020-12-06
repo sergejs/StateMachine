@@ -6,9 +6,7 @@ To start using, all you need is to defeine enums with States and Events, and def
 
 ## TODO:
 
-[ ]Add more tests coverage
-[ ]Some more tests
-[ ]Add some kind of check for Transitions(canTransit = (()-(bool))
+[  ] Improved logging control
 
 ## Example usage
 
