@@ -13,6 +13,10 @@ import SwiftLogger
 public protocol EventProtocol: Hashable {}
 public protocol StateProtocol: Hashable {}
 
+public enum StateMachineEror: Error {
+  case duplicateTransition
+}
+
 public protocol StateMachineProtocol {
   associatedtype StateType: StateProtocol
   associatedtype EventType: EventProtocol
@@ -23,52 +27,60 @@ public protocol StateMachineProtocol {
   var willChangeState: PassthroughSubject<StateMachineTransition<EventType, StateType>, Never> { get }
   var didChangeState: PassthroughSubject<StateMachineTransition<EventType, StateType>, Never> { get }
 
-  func append(transition: StateMachineTransition<EventType, StateType>)
+  func append(transition: StateMachineTransition<EventType, StateType>) throws
 }
 
 public class StateMachine<EventType: EventProtocol, StateType: StateProtocol>: StateMachineProtocol, Loggable {
-  let transitionQueue = OperationQueue()
+  internal let transitionQueue = OperationQueue()
   private var disposeBag = [AnyCancellable]()
   private var transitions = [EventType: [StateMachineTransition<EventType, StateType>]]()
+
   public var isLoggingEnabled = false {
     didSet {
-      if isLoggingEnabled {
-        allowLogging()
-      } else {
-        disableLogging()
-      }
+      isLoggingEnabledUpdated(with: isLoggingEnabled)
     }
   }
 
-  public let initialState: StateType
+  private let initialState: StateType
   public var state: CurrentValueSubject<StateType, Never>
-  public var event: PassthroughSubject<EventType, Never>
-  public var reset: PassthroughSubject<Void, Never>
-  public var willChangeState: PassthroughSubject<StateMachineTransition<EventType, StateType>, Never>
-  public var didChangeState: PassthroughSubject<StateMachineTransition<EventType, StateType>, Never>
+  public var event = PassthroughSubject<EventType, Never>()
+  public var reset = PassthroughSubject<Void, Never>()
+  public var willChangeState = PassthroughSubject<StateMachineTransition<EventType, StateType>, Never>()
+  public var didChangeState = PassthroughSubject<StateMachineTransition<EventType, StateType>, Never>()
 
-  public
-  required init(with state: StateType) {
+  public required init(with state: StateType) {
     self.state = CurrentValueSubject(state)
-    event = PassthroughSubject()
-    reset = PassthroughSubject()
-    willChangeState = PassthroughSubject()
-    didChangeState = PassthroughSubject()
     initialState = state
 
-    Logger.sharedInstance.setupLogger(logger: osLogger())
-
+    setupLogger()
+    
     setupEventSubject()
     setupResetSubject()
   }
 }
 
+private extension StateMachine {
+  func setupLogger() {
+    Logger.sharedInstance.setupLogger(logger: osLogger())
+  }
+
+  func isLoggingEnabledUpdated(with value: Bool) {
+    if value {
+      allowLogging()
+    } else {
+      disableLogging()
+    }
+  }
+}
+
 public extension StateMachine {
-  func append(transition: StateMachineTransition<EventType, StateType>) {
+  func append(transition: StateMachineTransition<EventType, StateType>) throws {
     if let transitionsByEvent = transitions[transition.event] {
       guard transitionsByEvent.filter({ $0.from == transition.from }).isEmpty else {
-        log(level: .fault, "Failed to appended \(transition.from) -> \(transition.to) with event \(transition.event)")
-        return assertionFailure("Transition \(transition.from) & \(transition.event) already exists!")
+        logFault(
+          "Failed to appended \(transition.from) -> \(transition.to) with event \(transition.event)"
+        )
+        throw StateMachineEror.duplicateTransition
       }
       transitions[transition.event]?.append(transition)
     } else {
@@ -78,9 +90,9 @@ public extension StateMachine {
 }
 
 public extension StateMachine {
-  func append(transitions: [StateMachineTransition<EventType, StateType>]) {
-    transitions.forEach { transition in
-      append(transition: transition)
+  func append(transitions: [StateMachineTransition<EventType, StateType>]) throws {
+    try transitions.forEach { transition in
+      try append(transition: transition)
     }
   }
 }
@@ -91,16 +103,16 @@ private extension StateMachine {
       .CombineLatest(event, state)
       .sink(receiveValue: { [weak self] event, currentState in
         guard
-          let this = self,
-          let transitions = this.transitions[event],
+          let self = self,
+          let transitions = self.transitions[event],
           transitions.filter({ $0.from == currentState }).count == 1,
           let transition = transitions.first(where: { $0.from == currentState })
         else { return }
 
         let transiotion = BlockOperation {
-          this.perform(transition: transition)
+          self.perform(transition: transition)
         }
-        this.transitionQueue.addOperation(transiotion)
+        self.transitionQueue.addOperation(transiotion)
       })
       .store(in: &disposeBag)
   }
@@ -108,9 +120,9 @@ private extension StateMachine {
   func setupResetSubject() {
     reset
       .sink { [weak self] _ in
-        guard let this = self else { return }
-        this.log(level: .info, "Performing RESET to \(this.initialState)")
-        this.state.send(this.initialState)
+        guard let self = self else { return }
+        self.log(level: .info, "Performing RESET to \(self.initialState)")
+        self.state.send(self.initialState)
       }
       .store(in: &disposeBag)
   }
@@ -119,7 +131,10 @@ private extension StateMachine {
 private extension StateMachine {
   func perform(transition: StateMachineTransition<EventType, StateType>) {
     willChangeState.send(transition)
-    log(level: .info, "Performing transition \(transition.from) -> \(transition.to) with event \(transition.event)")
+    log(
+      level: .info,
+      "Performing transition \(transition.from) -> \(transition.to) with event \(transition.event)"
+    )
     state.send(transition.to)
     didChangeState.send(transition)
   }
@@ -145,6 +160,12 @@ public struct StateMachineTransition<EventType: Hashable, StateType: Hashable> {
     from: [StateType],
     to: StateType
   ) -> [Self] {
-    from.map { Self(event: event, from: $0, to: to) }
+    from.map {
+      Self(
+        event: event,
+        from: $0,
+        to: to
+      )
+    }
   }
 }

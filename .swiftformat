@@ -4,8 +4,11 @@
 --wraparguments before-first
 --wrapparameters before-first
 --wrapcollections before-first
+--closingparen balanced
+--specifierorder public,override
 
+--enable redundantBreak, elseOnSameLine, duplicateImports, emptyBraces, isEmpty,redundantExtensionACL,redundantFileprivate,redundantGet,redundantLet,redundantReturn,todos,trailingCommas
 
---disable unusedArguments
+--disable unusedArguments, wrapMultilineStatementBraces
 
---exclude Pods, Libs, .build
+--exclude Pods, Libs, Generated, vendor
