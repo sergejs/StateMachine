@@ -53,7 +53,7 @@ public class StateMachine<EventType: EventProtocol, StateType: StateProtocol>: S
     initialState = state
 
     setupLogger()
-    
+
     setupEventSubject()
     setupResetSubject()
   }
@@ -99,8 +99,8 @@ public extension StateMachine {
 
 private extension StateMachine {
   func setupEventSubject() {
-    Publishers
-      .CombineLatest(event, state)
+    event
+      .withLatestFrom(state) { ($0, $1) }
       .sink(receiveValue: { [weak self] event, currentState in
         guard
           let self = self,
@@ -121,8 +121,13 @@ private extension StateMachine {
     reset
       .sink { [weak self] _ in
         guard let self = self else { return }
-        self.log(level: .info, "Performing RESET to \(self.initialState)")
-        self.state.send(self.initialState)
+
+        let transiotion = BlockOperation {
+          self.log(level: .info, "Performing RESET to \(self.initialState)")
+
+          self.state.send(self.initialState)
+        }
+        self.transitionQueue.addOperation(transiotion)
       }
       .store(in: &disposeBag)
   }

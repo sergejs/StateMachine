@@ -115,11 +115,37 @@ final class StateMachineTests: XCTestCase {
     XCTAssertThrowsError(try stateMachine.append(transition: transition))
   }
 
+  // Should associated type
+  func testReset() {
+    let stateMachine = StateMachine<TestEvents, TestStates>(with: .initial)
+    stateMachine.isLoggingEnabled = true
+    XCTAssertEqual(stateMachine.state.value, .initial)
+
+    try? stateMachine.append(
+      transition: TransitionType(
+        event: .event1,
+        from: .initial,
+        to: .step1
+      )
+    )
+    stateMachine.transitionQueue.waitUntilAllOperationsAreFinished()
+    XCTAssertEqual(stateMachine.state.value, .initial)
+
+    stateMachine.event.send(.event1)
+    stateMachine.transitionQueue.waitUntilAllOperationsAreFinished()
+    XCTAssertEqual(stateMachine.state.value, .step1)
+
+    // Alternative pass
+    stateMachine.reset.send()
+    stateMachine.transitionQueue.waitUntilAllOperationsAreFinished()
+    XCTAssertEqual(stateMachine.state.value, .initial)
+  }
 
   static var allTests = [
     ("testShort", testShort),
     ("testLong", testLong),
     ("testFailOnDuplicatieTransition", testFailOnDuplicatieTransition),
     ("testLongAlternative", testLongAlternative),
+    ("testReset", testReset),
   ]
 }
