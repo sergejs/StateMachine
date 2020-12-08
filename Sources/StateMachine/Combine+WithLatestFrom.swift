@@ -10,7 +10,7 @@ import Combine
 // MARK: - Operator methods
 
 @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
-extension Publisher {
+internal extension Publisher {
   ///  Merges two publishers into a single publisher by combining each value
   ///  from self with the latest value from the second publisher, if any.
   ///
@@ -43,7 +43,7 @@ extension Publisher {
 
 // MARK: - Publisher
 
-public extension Publishers {
+internal extension Publishers {
   @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
   struct WithLatestFrom<
     Upstream: Publisher,
