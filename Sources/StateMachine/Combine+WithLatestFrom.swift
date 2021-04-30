@@ -43,8 +43,8 @@ internal extension Publisher {
 
 // MARK: - Publisher
 
+@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 internal extension Publishers {
-  @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
   struct WithLatestFrom<
     Upstream: Publisher,
     Other: Publisher,
