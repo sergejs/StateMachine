@@ -6,6 +6,7 @@
 //  Copyright © 2020 Sergejs Smirnovs. All rights reserved.
 //
 
+#if canImport(Combine)
 import Combine
 import Foundation
 import SwiftLogger
@@ -17,6 +18,7 @@ public enum StateMachineEror: Error {
   case duplicateTransition
 }
 
+@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public protocol StateMachineProtocol {
   associatedtype StateType: StateProtocol
   associatedtype EventType: EventProtocol
@@ -30,6 +32,7 @@ public protocol StateMachineProtocol {
   func append(transition: StateMachineTransition<EventType, StateType>) throws
 }
 
+@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public class StateMachine<EventType: EventProtocol, StateType: StateProtocol>: StateMachineProtocol, Loggable {
   internal let transitionQueue = OperationQueue()
   private var disposeBag = [AnyCancellable]()
@@ -59,6 +62,7 @@ public class StateMachine<EventType: EventProtocol, StateType: StateProtocol>: S
   }
 }
 
+@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 private extension StateMachine {
   func setupLogger() {
     Logger.sharedInstance.setupLogger(logger: osLogger())
@@ -73,6 +77,7 @@ private extension StateMachine {
   }
 }
 
+@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public extension StateMachine {
   func append(transition: StateMachineTransition<EventType, StateType>) throws {
     if let transitionsByEvent = transitions[transition.event] {
@@ -89,6 +94,7 @@ public extension StateMachine {
   }
 }
 
+@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 public extension StateMachine {
   func append(transitions: [StateMachineTransition<EventType, StateType>]) throws {
     try transitions.forEach { transition in
@@ -97,6 +103,7 @@ public extension StateMachine {
   }
 }
 
+@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 private extension StateMachine {
   func setupEventSubject() {
     event
@@ -133,6 +140,7 @@ private extension StateMachine {
   }
 }
 
+@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 private extension StateMachine {
   func perform(transition: StateMachineTransition<EventType, StateType>) {
     willChangeState.send(transition)
@@ -174,3 +182,4 @@ public struct StateMachineTransition<EventType: Hashable, StateType: Hashable> {
     }
   }
 }
+#endif

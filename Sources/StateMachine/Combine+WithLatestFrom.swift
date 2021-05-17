@@ -5,6 +5,7 @@
 //  Copyright © 2019 Shai Mishali. All rights reserved.
 //
 
+#if canImport(Combine)
 import Combine
 
 // MARK: - Operator methods
@@ -43,8 +44,8 @@ internal extension Publisher {
 
 // MARK: - Publisher
 
+@available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
 internal extension Publishers {
-  @available(OSX 10.15, iOS 13.0, tvOS 13.0, watchOS 6.0, *)
   struct WithLatestFrom<
     Upstream: Publisher,
     Other: Publisher,
@@ -147,3 +148,4 @@ extension Publishers.WithLatestFrom {
     }
   }
 }
+#endif
