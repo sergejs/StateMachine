@@ -13,4 +13,5 @@ StateMachine
   s.ios.deployment_target = '10.0'
   s.source_files = 'Sources/StateMachine/**/*'
   s.dependency 'SwiftLogger'
+  s.weak_frameworks = 'Combine'
 end
