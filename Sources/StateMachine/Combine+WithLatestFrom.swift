@@ -5,6 +5,7 @@
 //  Copyright © 2019 Shai Mishali. All rights reserved.
 //
 
+#if canImport(Combine)
 import Combine
 
 // MARK: - Operator methods
@@ -147,3 +148,4 @@ extension Publishers.WithLatestFrom {
     }
   }
 }
+#endif

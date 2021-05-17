@@ -6,6 +6,7 @@
 //  Copyright © 2020 Sergejs Smirnovs. All rights reserved.
 //
 
+#if canImport(Combine)
 import Combine
 import Foundation
 import SwiftLogger
@@ -181,3 +182,4 @@ public struct StateMachineTransition<EventType: Hashable, StateType: Hashable> {
     }
   }
 }
+#endif
